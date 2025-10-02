@@ -1,6 +1,26 @@
-class Shape {
+public abstract class Shape {
+    private final String name;
+    
+    Shape (String name)
+    {
+        this.name = name;
+    }
     double area()
     { return 0.0;}
+
+    public String getName()
+    {
+        return name;
+    }
+
+    abstract void draw();
+
+    abstract String dimensionString();
+
+    public void print()
+    {
+        System.out.printf(name + "(" + dimensionString() + ") : " + area());
+    }
 }
 
 class Circle extends Shape {
@@ -9,8 +29,19 @@ class Circle extends Shape {
 
     Circle(double newRadius) {super(); radius = newRadius;}
 
-    double area() {return Pi * radius * radius}
+    double area() {return Pi * radius * radius;}
+
+    void draw()
+    {
+        System.out.printf("");
+    }
 }
+
+class Square extends Shape {
+    ;
+}
+
+
 
 class ListNode {
     String info;
