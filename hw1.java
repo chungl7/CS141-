@@ -1,0 +1,57 @@
+class Shape {
+    double area()
+    { return 0.0;}
+}
+
+class Circle extends Shape {
+    double radius;
+    static final double Pi = 3.14;
+
+    Circle(double newRadius) {super(); radius = newRadius;}
+
+    double area() {return Pi * radius * radius}
+}
+
+class ListNode {
+    String info;
+    ListNode next;
+    ListNode (String info, ListNode next)
+    {
+        this.info = info;
+        this.next = next;
+    }
+}
+
+class LinkedList {
+    ListNode head;
+
+    LinkedList(){
+        head = null;
+    }
+
+    void add (String x)
+    {
+        head = new ListNode(x, head);
+    }
+
+    int length()
+    {
+        int len = 0;
+        for(ListNode p = head; p != null; p = p.next)
+            ++len;
+        return len;
+    }
+
+    boolean isEmpty()
+    {
+        return head == null;
+    }
+
+    public String toString()
+    {
+        String result = "";
+        for(ListNode p = head; p != null; p = p.next)
+            result += p.info.toString() + " ";
+        return result;
+    }
+}
