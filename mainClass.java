@@ -121,7 +121,7 @@ class Rectangle extends Square{
 
     double area()
     {
-        return width * height;
+        return width * length;
     }
 
     public void draw()
