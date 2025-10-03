@@ -1,4 +1,4 @@
-public abstract class Shape {
+abstract class Shape {
     private final String name;
     
     Shape (String name)
@@ -227,27 +227,35 @@ class LinkedList {
     }
 }
 
-class mainClass
+public class mainClass
 {
-    public void main(String[] args)
+    public static void main(String[] args)
     {
+        if(args.length < 2)
+        {
+            System.out.println("Insufficient Input");
+            return;
+        }
         int arg1, arg2;
         arg1 = Integer.parseInt(args[0]);
         arg2 = Integer.parseInt(args[1]);
 
+        int arg1_2 = arg1 -1;
+        int arg2_2 = arg2 -1;
+
         Picture example = new Picture();
 
         example.add(new Triangle("FirstTriangle", arg1, arg2));
-        example.add(new Triangle("SecondTriangle", arg1-1, arg2-1));
+        example.add(new Triangle("SecondTriangle", arg1_2, arg2_2));
 
         example.add(new Circle("FirstCircle", arg1));
-        example.add(new Circle("SecondCircle", arg1-1));
+        example.add(new Circle("SecondCircle", arg1_2));
 
         example.add(new Square("FirstSquare", arg1));
-        example.add(new Square("SecondSquare", arg1-1));
+        example.add(new Square("SecondSquare", arg1_2));
 
         example.add(new Rectangle("FirstRectangle", arg1, arg2));
-        example.add(new Rectangle("SecondRectangle", arg1, arg2));
+        example.add(new Rectangle("SecondRectangle", arg1_2, arg2_2));
 
         example.printAll();
         example.drawAll();
