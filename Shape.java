@@ -13,13 +13,13 @@ public abstract class Shape {
         return name;
     }
 
-    abstract void draw();
+    public abstract void draw();
 
-    abstract String dimensionString();
+    public abstract String dimensionString();
 
     public void print()
     {
-        System.out.printf(name + "(" + dimensionString() + ") : " + area());
+        System.out.println(name + "(" + dimensionString() + ") : " + area());
     }
 }
 
@@ -38,7 +38,7 @@ class Circle extends Shape {
         return Pi * radius * radius;
     }
 
-    void draw()
+    public void draw()
     {
         System.out.println("   *****   ");
         System.out.println(" **     ** ");
@@ -49,14 +49,14 @@ class Circle extends Shape {
         System.out.println("   *****   ");
     }
 
-    String dimensionString()
+    public String dimensionString()
     {
         return String.valueOf((int)radius);
     }
 }
 
 class Square extends Shape {
-    double length;
+    protected double length;
 
     public Square(String name, double newLength)
     {
@@ -69,14 +69,14 @@ class Square extends Shape {
         return length *length;
     }
 
-    void draw()
+    public void draw()
     {
         System.out.println("***");
         System.out.println("* *");
         System.out.println("***");
     }
 
-    String dimensionString()
+    public String dimensionString()
     {
         return String.valueOf((int)length);
     }
@@ -97,14 +97,14 @@ class Triangle extends Shape {
         return 0.5 * base * height;
     }
 
-    void draw()
+    public void draw()
     {
         System.out.println("  *  ");
         System.out.println(" * * ");
         System.out.println("*****");
     }
 
-    String dimensionString()
+    public String dimensionString()
     {
         return ((int)base) + ", " + ((int)height);
     }
@@ -116,7 +116,7 @@ class Rectangle extends Square{
     public Rectangle(String name, double newWidth, double newHeight)
     {
         super(name, newHeight);
-        width = newWidth;
+        this.width = newWidth;
     }
 
     double area()
@@ -124,7 +124,7 @@ class Rectangle extends Square{
         return width * height;
     }
 
-    void draw()
+    public void draw()
     {
         System.out.println("*****");
         System.out.println("*   *");
@@ -132,23 +132,66 @@ class Rectangle extends Square{
         System.out.println("*****");
     }
 
-    String dimensionString()
+    public String dimensionString()
     {
         return ((int)height) + ", "+ ((int)width);
     }
 }
 
-
-
 class ListNode {
-    String info;
+    Shape info;
     ListNode next;
-    ListNode (String info, ListNode next)
+    ListNode (Shape info, ListNode next)
     {
         this.info = info;
         this.next = next;
     }
 }
+
+class Picture
+{
+    ListNode head;
+
+    public Picture()
+    {
+        head = null;
+    }
+
+    public void add(Shape sh)
+    {
+        head = new ListNode(sh, head);
+    }
+
+    public void printAll()
+    {
+        for(ListNode i = head; i != null; i = i.next )
+        {
+            i.info.print();
+        }
+    }
+
+    public void drawAll()
+    {
+        for(ListNode i = head; i != null; i = i.next)
+        {
+            i.info.draw();
+        }
+    }
+
+    public double totalArea()
+    {
+        double total = 0.0;
+
+        for(ListNode i = head; i != null; i = i.next)
+        {
+            total += i.info.area();
+        }
+        return total;
+    }
+}
+
+
+
 
 class LinkedList {
     ListNode head;
@@ -157,7 +200,7 @@ class LinkedList {
         head = null;
     }
 
-    void add (String x)
+    void add (Shape x)
     {
         head = new ListNode(x, head);
     }
@@ -182,4 +225,35 @@ class LinkedList {
             result += p.info.toString() + " ";
         return result;
     }
+}
+
+class mainClass
+{
+    public void main(String[] args)
+    {
+        int arg1, arg2;
+        arg1 = Integer.parseInt(args[0]);
+        arg2 = Integer.parseInt(args[1]);
+
+        Picture example = new Picture();
+
+        example.add(new Triangle("FirstTriangle", arg1, arg2));
+        example.add(new Triangle("SecondTriangle", arg1-1, arg2-1));
+
+        example.add(new Circle("FirstCircle", arg1));
+        example.add(new Circle("SecondCircle", arg1-1));
+
+        example.add(new Square("FirstSquare", arg1));
+        example.add(new Square("SecondSquare", arg1-1));
+
+        example.add(new Rectangle("FirstRectangle", arg1, arg2));
+        example.add(new Rectangle("SecondRectangle", arg1, arg2));
+
+        example.printAll();
+        example.drawAll();
+        System.out.println("Total : " + example.totalArea());
+
+    }
+
+    
 }
