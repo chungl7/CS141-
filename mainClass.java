@@ -117,11 +117,12 @@ class Rectangle extends Square{
     {
         super(name, newHeight);
         this.width = newWidth;
+        this.height = newHeight;
     }
 
     double area()
     {
-        return width * length;
+        return width * height;
     }
 
     public void draw()
@@ -134,7 +135,7 @@ class Rectangle extends Square{
 
     public String dimensionString()
     {
-        return ((int)height) + ", "+ ((int)width);
+        return ((int)width) + ", "+ ((int)height);
     }
 }
 
