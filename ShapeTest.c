@@ -242,7 +242,7 @@ int main(int argc, char** argv)
     Rectangle* r1 = Rectangle_Rectangle(new Rectangle, "FirstRectangle", value1, value2);
     Rectangle* r2 = Rectangle_Rectangle(new Rectangle, "SecondRectangle", value1_1, value2_2);
 
-    vector<Shape*> picture = 
+    Shape* picture[] = 
     {
         (Shape*) t1, (Shape*) t2,
         (Shape*) c1, (Shape*) c2,
@@ -250,8 +250,10 @@ int main(int argc, char** argv)
         (Shape*) &r1->base_class, (Shape*) &r2->base_class
     };
 
-    printAll(picture.data(), (int)picture.size());
-    drawAll(picture.data(), (int)picture.size());
-    cout << "Total : " << totalArea(picture.data(), (int)picture.size()) << "\n";
+    int N = (int) (sizeof(picture)/sizeof(picture[0]));
+
+    printAll(picture, (N));
+    drawAll(picture, (N));
+    cout << "Total : " << totalArea(picture, N) << "\n";
     return 0;
 }
