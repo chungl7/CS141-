@@ -1,6 +1,6 @@
-#include <stdlib.h>
 #include <iostream>
 #include <cstdlib>
+#include <string>
 using namespace std;
 
 
@@ -231,6 +231,7 @@ static double totalArea(Shape** arr, int n)
 
 int main(int argc, char** argv)
 {
+    if (argc < 3) {cout << "Insufficient amount of input \n"; return 0;}
     int value1 = atoi(argv[1]);
     int value2 = atoi(argv[2]);
 
