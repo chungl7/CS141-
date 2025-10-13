@@ -50,7 +50,7 @@ static double Circle_area(Circle* _this)
     return PI * _this->radius * _this->radius;
 }
 
-static void Circle_draw(Circle*_this)
+static void Circle_draw(void* p)
 {
     cout << "  ***  \n"
             " *   * \n"
@@ -95,7 +95,7 @@ static double Square_area(Square* _this)
     return _this->length * _this->length;
 }
 
-static void Square_draw(Square* _this)
+static void Square_draw(void * p)
 {
     cout << "*** \n"
             "* * \n"
@@ -135,7 +135,7 @@ static double Rectangle_area(Rectangle* _this)
     return _this->width * _this->height;
 }
 
-static void Rectangle_draw(Rectangle* _this)
+static void Rectangle_draw(void * p)
 {
     cout << "***** \n"
             "*   * \n"
@@ -176,12 +176,12 @@ struct Triangle
     double height;
 };
 
-static double Triangle_area(Triangle* _this)
+static double Triangle_area()
 {
     return 0.5 * _this->base * _this->height;
 }
 
-static void Triangle_draw(Triangle*_this)
+static void Triangle_draw(void * p)
 {
     cout << "  *  \n"
             " * * \n"
