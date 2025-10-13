@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <iostream>
-#include <vector>
 #include <cstdlib>
 using namespace std;
 
@@ -37,11 +36,17 @@ static inline void Shape_print(Shape* _this)
     cout << _this->name << "(" << dims << ") : " << a << "\n";
 }
 
+static Shape* Shape_Shape(Shape* _this, const string& newName)
+{
+    _this->name = newName;
+    return _this;
+}
+
 
 struct Circle
 {
     VTableType VPointer;
-    std::string name;
+    string name;
     double radius;
 };
 
@@ -65,12 +70,13 @@ static string Circle_dimensionString(Circle* _this)
 VirtualTableEntry Circle_VTable [] = 
 {
     {.double_method=(double_method_type)Circle_area},
-    {.double_method=(double_method_type)Circle_draw},
+    {.void_method=(void_method_type) Circle_draw},
     {.string_method=(string_method_type)Circle_dimensionString}
 };
 
 Circle * Circle_Circle(Circle * _this, const string newName, double newRadius)
 {
+    Shape_Shape((Shape*) _this, newName);
     _this->VPointer = Circle_VTable;
     _this->name = newName;
     _this->radius = newRadius;
@@ -111,6 +117,7 @@ static VirtualTableEntry Square_VTable[] =
 
 static Square* Square_Square(Square* _this, const string newName, double newLength)
 {
+    Shape_Shape((Shape*)_this, newName);
     _this->VPointer = Square_VTable;
     _this->name = newName;
     _this->length = newLength;
@@ -154,9 +161,8 @@ static VirtualTableEntry Rectangle_VTable[] =
 
 static Rectangle* Rectangle_Rectangle(Rectangle*_this, const string newName, double newWidth, double newHeight)
 {
+    Square_Square(&_this->base_class, newName, newHeight);
     _this->base_class.VPointer = Rectangle_VTable;
-    _this->base_class.name = newName;
-    _this->base_class.length = newHeight;
     _this->width = newWidth;
     _this->height = newHeight;
     return _this;
@@ -197,6 +203,7 @@ static VirtualTableEntry Triangle_VTable[] =
 
 static Triangle* Triangle_Triangle(Triangle* _this, const string newName, double newBase, double newHeight)
 {
+    Shape_Shape((Shape*)_this, newName);
     _this->VPointer = Triangle_VTable;
     _this->name = newName;
     _this->base = newBase;
