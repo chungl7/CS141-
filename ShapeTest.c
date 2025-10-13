@@ -176,7 +176,7 @@ struct Triangle
     double height;
 };
 
-static double Triangle_area()
+static double Triangle_area(Triangle* _this)
 {
     return 0.5 * _this->base * _this->height;
 }
