@@ -6,7 +6,7 @@ using namespace std;
 
 typedef double (*double_method_type)(void *);
 typedef void (*void_method_type)(void *);
-typedef std::string (*string_method_type)(void *);
+typedef string (*string_method_type)(void *);
 
 typedef union{
     double_method_type double_method;
@@ -26,7 +26,7 @@ typedef VirtualTableEntry * VTableType;
 struct Shape
 {
     VTableType VPointer;
-    std::string name;
+    string name;
 };
 
 static inline void Shape_print(Shape* _this)
@@ -55,7 +55,7 @@ static double Circle_area(Circle* _this)
     return PI * _this->radius * _this->radius;
 }
 
-static void Circle_draw(void* p)
+static void Circle_draw(Circle* _this)
 {
     cout << "  ***  \n"
             " *   * \n"
@@ -71,12 +71,12 @@ VirtualTableEntry Circle_VTable [] =
 {
     {.double_method=(double_method_type)Circle_area},
     {.void_method=(void_method_type) Circle_draw},
-    {.string_method=(string_method_type)Circle_dimensionString}
+    {.string_method= (string_method_type) Circle_dimensionString}
 };
 
 Circle * Circle_Circle(Circle * _this, const string newName, double newRadius)
 {
-    Shape_Shape((Shape*) _this, newName);
+    Shape_Shape((Shape*)_this, newName);
     _this->VPointer = Circle_VTable;
     _this->name = newName;
     _this->radius = newRadius;
@@ -87,7 +87,7 @@ Circle * Circle_Circle(Circle * _this, const string newName, double newRadius)
 struct Square
 {
     VTableType VPointer;
-    std::string name;
+    string name;
     double length;
 };
 
@@ -96,7 +96,7 @@ static double Square_area(Square* _this)
     return _this->length * _this->length;
 }
 
-static void Square_draw(void * p)
+static void Square_draw(Square* _this)
 {
     cout << "*** \n"
             "* * \n"
@@ -136,7 +136,7 @@ static double Rectangle_area(Rectangle* _this)
     return _this->width * _this->height;
 }
 
-static void Rectangle_draw(void * p)
+static void Rectangle_draw(Rectangle* _this)
 {
     cout << "***** \n"
             "*   * \n"
@@ -182,7 +182,7 @@ static double Triangle_area(Triangle* _this)
     return 0.5 * _this->base * _this->height;
 }
 
-static void Triangle_draw(void * p)
+static void Triangle_draw(Triangle* _this)
 {
     cout << "  *  \n"
             " * * \n"
