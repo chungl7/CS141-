@@ -32,7 +32,7 @@ struct Shape
 
 static inline void Shape_print(Shape* _this)
 {
-    std::string dims = _this->VPointer[DIMSTR_INDEX].string_method(_this);
+    string dims = _this->VPointer[DIMSTR_INDEX].string_method(_this);
     double a = _this->VPointer[AREA_INDEX].double_method(_this);
     cout << _this->name << "(" << dims << ") : " << a << "\n";
 }
@@ -125,8 +125,7 @@ static Square* Square_Square(Square* _this, const string newName, double newLeng
 
 struct Rectangle
 {
-    VTableType VPointer;
-    string name;
+    Square base_class;
     double width, height;
 };
 
@@ -160,8 +159,9 @@ static VirtualTableEntry Rectangle_VTable[] =
 
 static Rectangle* Rectangle_Rectangle(Rectangle*_this, const string newName, double newWidth, double newHeight)
 {
-    _this->VPointer = Rectangle_VTable;
-    _this->name = newName;
+    _this->base_class.VPointer = Rectangle_VTable;
+    _this->base_class.name = newName;
+    _this->base_class.length = newHeight;
     _this->width = newWidth;
     _this->height = newHeight;
     return _this;
