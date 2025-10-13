@@ -62,15 +62,10 @@ static string Circle_dimensionString(Circle* _this)
     return to_string((int)_this->radius);
 }
 
-double Circle_circumference(Circle* _this)
-{
-    return 2.0 * PI *_this->radius;
-}
-
 VirtualTableEntry Circle_VTable [] = 
 {
     {.double_method=(double_method_type)Circle_area},
-    {.double_method=(double_method_type)Circle_circumference},
+    {.double_method=(double_method_type)Circle_draw},
     {.string_method=(string_method_type)Circle_dimensionString}
 };
 
@@ -249,10 +244,10 @@ int main(int argc, char** argv)
 
     vector<Shape*> picture = 
     {
-        (Shape*) r2, (Shape*) r1,
-        (Shape*) s2, (Shape*) s1,
-        (Shape*) c2, (Shape*) c1,
-        (Shape*) t2, (Shape*) t1
+        (Shape*) t1, (Shape*) t2,
+        (Shape*) c1, (Shape*) c2,
+        (Shape*) s1, (Shape*) s2,
+        (Shape*) &r1->base_class, (Shape*) &r2->base_class
     };
 
     printAll(picture.data(), (int)picture.size());
