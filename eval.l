@@ -42,6 +42,8 @@
 ;; to my-eval only in the call made by my-top defined below.
 
 
+(defvar global-alist nil)
+
 
 (defun my-assoc (v alist)
   (cond ((null alist) nil)
@@ -59,15 +61,13 @@
 
 
 (defun my-eval-atom (e alist)
-;; how do you evaluate an atom???
-;; Remember there are special cases: T, NIL, MY-SYMBOL, 10, "Hello"
     (cond ((null e) nil)
         ((eq e 't) 't)
         ((numberp e) e)
         ((stringp e) e)
         ((symbolp e)
             (cond((my-assoc e alist)
-                    (cdr(my-assoc e alist))
+                    (cdr (my-assoc e alist))
                     )
                 ((my-assoc e global-alist)
                     (cdr (my-assoc e global-alist)))
@@ -101,7 +101,7 @@
 
 (defun my-apply-lambda (fn args alist)
     (my-eval-list (cdr(cdr fn))
-        (my-bind-formals (car (cdr fn) args alist))
+        (my-bind-formals ((car (cdr fn)) args alist))
     )
 )
 
@@ -259,13 +259,13 @@
 
 (defun my-eval-defun (body alist)
     (setq global-alist
-        (cons (cons (car body) (cons (car (cdr body) (cdr (cdr body)))))
+        (cons (cons (car body) (cons ((car (cdr body)) ((cdr (cdr body))))))
                 global-alist))
     (car body)
 )
 
 
-(defvar global-alist nil)
+
 
 (defun my-top ()
     (prog ()
