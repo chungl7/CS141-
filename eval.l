@@ -162,7 +162,23 @@
                     (my-eval (car (cdr args) alist)))
           )
 
-          ((eq fn 'atom)
+          ((eq fn 'car)
+		    (car (my-eval (car args) alist))
+          )
+          
+          ((eq fn 'cdr)
+		    (cdr (my-eval (car args) alist))
+          )
+          ((eq fn 'cons)
+		    (cons (my-eval (car args) alist)
+                    (my-eval (car (cdr args)) alist)
+            )
+          )
+          ((eq fn 'quote)
+		    (car args)
+          )
+
+           ((eq fn 'atom)
             (atom (my-eval (car args) alist))
           )
 
@@ -170,30 +186,49 @@
             (null (my-eval (car args) alist))
           )
 
-          ((eq fn 'listp))
+          ((eq fn 'listp)
+            (cond ((null (my-eval (car args) alist)) 't)
+                    ((atom (my-eval (car args) alist)) nil)
+                    (t 't)
+            )
+          )
+
+          ((eq fn 'setq)
+            (my-eval-setq (car args) (my-eval (car (cdr args)) alist))
+          )
 
 
-          ((eq fn 'car)
-		    nil
+          ((eq fn 'cond)
+            (my-eval-cond args alist)
           )
-          ((eq fn 'cdr)
-		    nil
+
+          ((eq fn 'defun) 
+            (my-eval-defun args alist)
           )
-          ((eq fn 'cons)
-		    nil
+
+          ((eq fn 'eval)
+            (my-eval (my-eval (car args) alist) alist)
           )
-          ((eq fn 'quote)
-		    nil
+
+		  (t
+            (cond ((my-assoc fn alist)
+                    (my-apply
+                        (cons 'lambda
+                            (cons (car (cdr (my-assoc fn alist)))
+                            (cdr (cdr (my-assoc fn alist)))))   
+                        args alist))
+                   ((my-assoc fn global-alist)
+                    (my-apply
+                        (cons 'lambda
+                                (cons (car (cdr (my-assoc fn global-alist)))
+                                       (cdr (cdr (my-assoc fn global-alist)))))
+                        args alist)
+                   )
+
+                   (t nil)
+            )
+
           )
-          ((eq fn 'setq) (my-eval-setq ;; you'll have to figure out the arguments to pass
-                                nil nil))
-          ((eq fn 'cond) (my-eval-cond args alist))
-          ((eq fn 'defun) (my-eval-defun args alist))
-          ((eq fn 'eval) (my-eval (my-eval (car args) alist) alist))
-		  ;; in this last case, function must be a variable bound to a function
-		  ;; so get the lambda from the alist and then apply that to the arguments
-          (T (my-apply nil ;; this nil must be replaced by the correct expression
-                       args alist))
     )
 )
 
