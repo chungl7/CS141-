@@ -44,7 +44,6 @@
 
 (defvar global-alist nil)
 
-
 (defun my-assoc (v alist)
   (cond ((null alist) nil)
         ((eq v (car (car alist))) (car alist))
@@ -67,7 +66,7 @@
         ((stringp e) e)
         ((symbolp e)
             (cond((my-assoc e alist)
-                    (cdr (my-assoc e alist))
+                    (cdr(my-assoc e alist))
                     )
                 ((my-assoc e global-alist)
                     (cdr (my-assoc e global-alist)))
@@ -101,7 +100,7 @@
 
 (defun my-apply-lambda (fn args alist)
     (my-eval-list (cdr(cdr fn))
-        (my-bind-formals ((car (cdr fn)) args alist))
+        (my-bind-formals (car (cdr fn)) args alist)
     )
 )
 
@@ -159,7 +158,7 @@
 
           ((eq fn 'equal)
             (equal (my-eval (car args) alist)
-                    (my-eval (car (cdr args) alist)))
+                    (my-eval (car (cdr args)) alist))
           )
 
           ((eq fn 'car)
@@ -259,7 +258,7 @@
 
 (defun my-eval-defun (body alist)
     (setq global-alist
-        (cons (cons (car body) (cons ((car (cdr body)) ((cdr (cdr body))))))
+        (cons (cons (car body) (cons (car (cdr body)) (cdr (cdr body))))
                 global-alist))
     (car body)
 )
