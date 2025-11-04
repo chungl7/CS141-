@@ -108,6 +108,7 @@
 
 (defun my-bind-formals (formals actuals alist)
     (cond ((null formals) alist)
+            ((null A) (error "error"))
         (t
             (cons (cons (car formals) (my-eval (car actuals) alist))
             (my-bind-formals (cdr formals) (cdr actuals) alist)
