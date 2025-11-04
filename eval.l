@@ -209,6 +209,24 @@
             (my-eval (my-eval (car args) alist) alist)
           )
 
+          ((eq fn 'print)
+            (print (my-eval (car args) alist))
+          )
+
+          ((eq fn '+)
+            (my-plus args alist 0)
+          )
+
+          ((eq fn '-)
+            (my-minus args alist)
+          )
+
+          ((eq fn '*)
+            (my-times args alist 1)
+          )
+
+
+
 		  (t
             (cond ((my-assoc fn alist)
                     (my-apply
