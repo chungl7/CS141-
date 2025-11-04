@@ -225,6 +225,13 @@
             (my-times args alist 1)
           )
 
+          ((eq fn 'apply)
+            (my-apply
+            (my-eval (car args) alist)
+            (my-quote-list(my-eval (car (cdr args)) alist))
+            alist)
+          )
+
 
 
 		  (t
