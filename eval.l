@@ -226,6 +226,19 @@
             (my-times args alist 1)
           )
 
+          ((eq fn 'mod)
+            (mod (my-eval (car args) alist)
+                (my-eval (car (cdr args)) alist))
+          )
+
+          ((eq fn 'floor)
+            (if (null (cdr args))
+                (floor (my-eval (car args) alist))
+                (floor (my-eval (car args) alist)
+                        (my-eval (car (cdr args)) alist))
+            )
+          )
+
           ((eq fn 'apply)
             (my-apply
             (my-eval (car args) alist)
