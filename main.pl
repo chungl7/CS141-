@@ -12,10 +12,10 @@ my_append([H|T], L2, [H|R]) :-
     my_append(T, L2, R).
 
 my_reverse(L, R) :- 
-    my_rev_(L, [], R).
-my_rev_([], Acc, Acc).
-my_rev_([H|T], Acc, R) :-
-    my_rev_(T, [H|Acc], R).
+    my_rev_help(L, [], R).
+my_rev_help([], Acc, Acc).
+my_rev_help([H|T], Acc, R) :-
+    my_rev_help(T, [H|Acc], R).
 
 my_nth(L, 1, L) :- !.
 my_nth([], _, []) :- !.
@@ -82,7 +82,24 @@ my_merge([H1|T1], [H2|T2], [H2|R]) :-
     H1 > H2,
     my_merge([H1|T1], T2, R).
 
+my_sublist(Sub, L) :-
+    my_sublist_help(L, Sub), !.
+my_sublist_help(Sub, [_|T]) :-
+    my_sublist_help(Sub, T).
+
+my_sublist_help(_, []) :- !.
+my_sublist_help([H|T], [H|S]) :-
+    my_sublist_help(T, S).
+
+my_assoc(A, [A,Val|_], Val) :- !.
+my_assoc(A, [_K,_V|T], R) :-
+    my_assoc(A, T, R).
 
 
-
+my_replace(_, [], []).
+my_replace(AL, [H|T], [V|R]) :-
+    my_assoc(H, AL, V), !,
+    my_replace(AL, T, R).
+my_replace(AL, [H|T], [H|R]) :-
+    my_replace(AL, T, R).
 
