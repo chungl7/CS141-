@@ -84,8 +84,8 @@ my_merge([H1|T1], [H2|T2], [H2|R]) :-
 
 my_sublist(Sub, L) :-
     my_sublist_help(L, Sub), !.
-my_sublist_help(Sub, [_|T]) :-
-    my_sublist_help(Sub, T).
+my_sublist(Sub, [_|T]) :-
+    my_sublist(Sub, T).
 
 my_sublist_help(_, []) :- !.
 my_sublist_help([H|T], [H|S]) :-
