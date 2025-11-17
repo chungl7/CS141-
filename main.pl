@@ -70,6 +70,13 @@ simplify_plus(A, B, S) :-
     S is A + B.
 simplify_plus(0, B, B) :- !.
 simplify_plus(A, 0, A) :- !.
+simplify_plus(A, B, S) :-
+    B = (K / Val),
+    number(K),
+    K < 0, !,
+    K1 is -K,
+    S = A - K1 / Val.
+
 simplify_plus(A, B, A + B).
 
 simplify_minus(A, B, S) :-
@@ -90,7 +97,7 @@ simplify_minus(A, B, A - B).
 
 simplify_times(A, B, S) :-
     number(A),
-    number(B),
+    number(B), !,
     S is A * B.
 simplify_times(0, _, 0) :- !.
 simplify_times(_, 0, 0) :- !.
