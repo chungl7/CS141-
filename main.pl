@@ -78,6 +78,14 @@ simplify_minus(A, B, S) :-
     S is A - B.
 simplify_minus(A, 0, A) :- !.
 simplify_minus(A, A, 0) :- !.
+
+simplify_minus(A, B, S) :-
+    B = (K / Val),
+    number(K),
+    K < 0, !,
+    K1 is -K,
+    simplify_plus(A, K1 / Val, S).
+
 simplify_minus(A, B, A - B).
 
 simplify_times(A, B, S) :-
@@ -88,6 +96,19 @@ simplify_times(0, _, 0) :- !.
 simplify_times(_, 0, 0) :- !.
 simplify_times(1, B, B) :- !.
 simplify_times(A, 1, A) :- !.
+
+simplify_times(A, B, S) :-
+    number(A),
+    B = K * R,
+    number(K) , !.
+    C is A * K,
+    simplify_times(C, R, S).
+
+simplify_times(A, B, S) :-
+    number(B), 
+    \+ number(A), !,
+    simplify_times(B, A, S).
+
 simplify_times(A, B, A * B).
 
 
@@ -99,6 +120,8 @@ simplify_divide(A, B, S) :-
 simplify_divide(0, _, 0) :- !.
 simplify_divide(A, 1, A) :- !.
 simplify_divide(A, A, 1) :- !.
+simplify_divide(A * B, B, A) :- !.
+simplify_divide(B * A, B, A) :- !.
 simplify_divide(A, B, A / B).
 
 
