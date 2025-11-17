@@ -148,7 +148,7 @@ deriv_help(A - B, D1 - D2) :-
 
 deriv_help(A * B, A * D2 + B * D1) :-
     deriv_help(A, D1),
-    deriv_hlep(B, D2).
+    deriv_help(B, D2).
 
 deriv_help(A ^ N, N * A ^ N1 * DA) :-
     integer(N),
