@@ -109,3 +109,53 @@ simplify_power(A, B, S) :-
 simplify_power(_, 0, 1) :- !.
 simplify_power(A, 1, A) :- !.
 simplify_power(A, B, A ^ B).
+
+
+deriv(E, D) :-
+    simplify(E, Es),
+    deriv_help(Es, D0),
+    simplify(D0, D).
+
+deriv_help(N, 0) :-
+    number(N), !.
+
+deriv_help(x, 1) :- !.
+
+deriv_help(V, 0) :-
+    atom(V),
+    V \= x, !.
+
+deriv_help(K / (x ^ N), D) :-
+    number(K),
+    integer(N), 
+    N > 0, !,
+    K1 is -K * N,
+    N1 is N + 1,
+    D = K1 / (x ^ N1).
+
+deriv_help(K / x, D) :-
+    number(K), !,
+    K1 is -K,
+    D = K1 / (x ^ 2).
+
+deriv_help(A + B, D1 + D2) :-
+    deriv_help(A, D1),
+    deriv_help(B, D2).
+
+deriv_help(A - B, D1 - D2) :-
+    deriv_help(A, D1),
+    deriv_help(B, D2).
+
+deriv_help(A * B, A * D2 + B * D1) :-
+    deriv_help(A, D1),
+    deriv_hlep(B, D2).
+
+deriv_help(A ^ N, N * A ^ N1 * DA) :-
+    integer(N),
+    N > 0,
+    N1 is N - 1,
+    deriv_help(A, DA).
+
+deriv_help(A / B, (D1 * B - A * D2) / (B ^ 2)) :-
+    deriv_help(A, D1),
+    deriv_help(B, D2).
