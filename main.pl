@@ -42,6 +42,28 @@ simplify(A + B, S) :-
     simplify(B, S2),
     simplify_plus(S1, S2, S).
 
+simplify(A - B, S) :-
+    simplify(A, S1),
+    simplify(B, S2),
+    simplify_minus(S1, S2, S).
+
+
+simplify(A * B, S) :-
+    simplify(A, S1),
+    simplify(B, S2),
+    simplify_times(S1, S2, S).
+
+simplify(A / B, S) :-
+    simplify(A, S1),
+    simplify(B, S2),
+    simplify_divide(S1, S2, S).
+
+simplify(A ^ B, S) :-
+    simplify(A, S1),
+    simplify(B, S2),
+    simplify_power(S1, S2, S).
+
+
 simplify_plus(A, B, S) :-
     number(A),
     number(B), !,
@@ -50,11 +72,6 @@ simplify_plus(0, B, B) :- !.
 simplify_plus(A, 0, A) :- !.
 simplify_plus(A, B, A + B).
 
-simplify(A - B, S) :-
-    simplify(A, S1),
-    simplify(B, S2),
-    simplify_minus(S1, S2, S).
-
 simplify_minus(A, B, S) :-
     number(A), 
     number(B), !,
@@ -62,11 +79,6 @@ simplify_minus(A, B, S) :-
 simplify_minus(A, 0, A) :- !.
 simplify_minus(A, A, 0) :- !.
 simplify_minus(A, B, A - B).
-
-simplify(A * B, S) :-
-    simplify(A, S1),
-    simplify(B, S2),
-    simplify_times(S1, S2, S).
 
 simplify_times(A, B, S) :-
     number(A),
@@ -78,10 +90,6 @@ simplify_times(1, B, B) :- !.
 simplify_times(A, 1, A) :- !.
 simplify_times(A, B, A * B).
 
-simplify(A / B, S) :-
-    simplify(A, S1),
-    simplify(B, S2),
-    simplify_divide(S1, S2, S).
 
 simplify_divide(A, B, S) :-
     number(A),
@@ -93,10 +101,6 @@ simplify_divide(A, 1, A) :- !.
 simplify_divide(A, A, 1) :- !.
 simplify_divide(A, B, A / B).
 
-simplify(A ^ B, S) :-
-    simplify(A, S1),
-    simplify(B, S2),
-    simplify_power(S1, S2, S).
 
 simplify_power(A, B, S) :-
     number(A),
@@ -105,4 +109,3 @@ simplify_power(A, B, S) :-
 simplify_power(_, 0, 1) :- !.
 simplify_power(A, 1, A) :- !.
 simplify_power(A, B, A ^ B).
-
