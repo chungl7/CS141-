@@ -100,7 +100,7 @@ simplify_times(A, 1, A) :- !.
 simplify_times(A, B, S) :-
     number(A),
     B = K * R,
-    number(K) , !.
+    number(K), !.
     C is A * K,
     simplify_times(C, R, S).
 
@@ -139,6 +139,9 @@ deriv(E, D) :-
     deriv_help(Es, D0),
     simplify(D0, D).
 
+deriv_help(K * x, K) :-
+    number(K), !.
+
 deriv_help(N, 0) :-
     number(N), !.
 
@@ -155,6 +158,16 @@ deriv_help(K / (x ^ N), D) :-
     K1 is -K * N,
     N1 is N + 1,
     D = K1 / (x ^ N1).
+
+deriv_help(K * (x ^ N), D) :-
+    number(K),
+    integer(N),
+    N > 0, !,
+    C is K * N,
+    N1 is N - 1,
+    ( N1 = 0 -> D = C
+    ; D = C * (x ^ N1)
+    ).
 
 deriv_help(K / x, D) :-
     number(K), !,
