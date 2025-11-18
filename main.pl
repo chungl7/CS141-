@@ -215,6 +215,9 @@ party_seating(L) :-
     length_helper(L, 10),
     valid_seating_helper(L), !.
 
+length_helper(L, N) :-
+    length(L, N).
+
 permute_helper([], []).
 permute_helper(L, [X|R]) :-
     select(X, L, L1),
