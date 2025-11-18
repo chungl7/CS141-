@@ -107,7 +107,7 @@ simplify_times(A, 1, A) :- !.
 simplify_times(A, B, S) :-
     number(A),
     B = K * R,
-    number(K), !.
+    number(K), !,
     C is A * K,
     simplify_times(C, R, S).
 
