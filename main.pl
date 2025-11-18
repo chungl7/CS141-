@@ -202,3 +202,56 @@ deriv_help(A ^ N, N * A ^ N1 * DA) :-
 deriv_help(A / B, (D1 * B - A * D2) / (B ^ 2)) :-
     deriv_help(A, D1),
     deriv_help(B, D2).
+
+guest(X) :-
+    male(X).
+
+guest(X) :-
+    female(X).
+
+party_seating(L) :-
+    findall(G, guest(G), Guests),
+    permute_helper(Guests, L),
+    length_helper(L, 10),
+    valid_seating_helper(L), !.
+
+permute_helper([], []).
+permute_helper(L, [X|R]) :-
+    select(X, L, L1),
+    permute_helper(L1, R).
+
+select(X, [X|T], T).
+select(X, [H|T], [H|R]) :-
+    select(X, T, R).
+
+valid_seating_helper(L) :-
+    no_females(L),
+    same_language(L).
+
+no_females([H|T]) :-
+    last_element([H|T], Last),
+    no_females_linear([H|T]),
+    \+ (female(T), female(H)).
+
+no_females_linear([_]).
+no_females_linear([A,B|T]) :-
+    \+ (female(A), female(B)),
+    no_females_linear([B|T]).
+
+same_language([H|T]) :-
+    last_element([H|T], Last),
+    same_language([H|T]),
+    common_language(Last, H).
+
+same_language_linear([_]).
+same_language_linear([A,B|T]) :-
+    common_language(A, B),
+    same_language_linear([B|T]).
+
+common_language(A, B) :-
+    speaks(A, L),
+    speaks(B, L).
+
+last_element([X], X).
+last_element([_|T], X) :-
+    last_element(T, X).
