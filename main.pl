@@ -231,7 +231,7 @@ valid_seating_helper(L) :-
 no_females([H|T]) :-
     last_element([H|T], Last),
     no_females_linear([H|T]),
-    \+ (female(T), female(H)).
+    \+ (female(H), female(Last)).
 
 no_females_linear([_]).
 no_females_linear([A,B|T]) :-
@@ -240,7 +240,7 @@ no_females_linear([A,B|T]) :-
 
 same_language([H|T]) :-
     last_element([H|T], Last),
-    same_language([H|T]),
+    same_language_linear([H|T]),
     common_language(Last, H).
 
 same_language_linear([_]).
