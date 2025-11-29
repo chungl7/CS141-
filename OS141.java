@@ -203,7 +203,7 @@ class UserThread extends Thread {
                     StringBuffer name = new StringBuffer(part[1]);
                     FileInfo info = directoryManager.lookup(name);
                     if (info != null) {
-                        PrintJobThread job = PrintJobThread(info);
+                        PrintJobThread job = new PrintJobThread(info);
                         job.start();
                     }
                 }
@@ -216,39 +216,108 @@ class UserThread extends Thread {
 }
 
 class PrintJobThread extends Thread {
+    private FileInfo info;
 
+    PrintJobThread(FileInfo info) {
+        this.info = info;
+    }
+
+    public void run() {
+        int printerIndex = UserThread.printerManager.request();
+        try {
+            Printer print = UserThread.printers[printerIndex];
+            Disk dis =UserThread.disks[info.diskNumber];
+
+            StringBuffer buffer = new StringBuffer();
+            for(int i = 0; i < info.fileLength; i++){
+                dis.read(info.startingSector + i, buffer);
+                print.print(buffer);
+            }
+        } finally {
+            UserThread.printerManager.release(printerIndex);
+        }
+    }
 }
 
 public class OS141 {
-    int NUM_USERS=4, NUM_DISKS=2, NUM_PRINTERS=3;
+    int NUM_USERS = 4, NUM_DISKS = 2, NUM_PRINTERS = 3;
     String userFileNames[];
     UserThread users[];
     Disk disks[];
     Printer printers[];
     DiskManager diskManager;
     PrinterManager printerManager;
-    void configure(String argv[]) { … }
+    DirectoryManager directoryManager;
+
+
+    void configure(String argv[]) {
+        if (argv != null && argv.length >= 3) {
+            NUM_USERS = passArg(argv[0], NUM_USERS);
+            NUM_DISKS = passArg(argv[1], NUM_DISKS);
+            NUM_PRINTERS = passArg(argv[2], NUM_PRINTERS);
+        }
+        userFileNames = new String[NUM_USERS];
+        for (int i = 0; i < NUM_USERS; i++) {
+            userFileNames[i] = "USER" + i;
+        }
+
+    }
+
+    private int passArg(String str, int defaultVal) {
+        if (str == null || str.length() == 0) return defaultVal;
+        if (str.charAt(0) == '-') str = str.substring(1);
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e)
+        {
+            return defaultVal;
+        }
+    }
+
     OS141(String [] argv) {
-        configure(argv)
+        configure(argv);
+
         disks = new Disk[NUM_DISKS];
         for (int i = 0; i < NUM_DISKS; ++i)
-            disk[i] = new Disk();
+            disks[i] = new Disk();
+
         printers = new Printer[NUM_PRINTERS];
         for (int i = 0; i < NUM_PRINTERS; ++i)
             printers[i] = new Printer(i);
+
+        directoryManager = new DirectoryManager();
         diskManager = new DiskManager(disks);
         printerManager = new PrinterManager(printers);
+
+        UserThread.disks = disks;
+        UserThread.printers = printers;
+        UserThread.diskManager = diskManager;
+        UserThread.printerManager = printerManager;
+        UserThread.directoryManager = directoryManager;
+        
+        users = new UserThread[NUM_USERS];
+        for(int i = 0; i < NUM_USERS; i++) {
+            users[i] = new UserThread(userFileNames[i]); 
+        }
     }
 
     void startUserThreads()
     {for (int i=0; i < NUM_USERS; i++) users[i].start();}
 
-    void joinUserThreads()
-    {for(int i=0; i < NUM_USERS; i++) users[i].join();}
+    void joinUserThreads() {
+        for(int i=0; i < NUM_USERS; i++) {
+            try {
+                users[i].join();
+            } catch (InterruptedException e) {
+
+            }
+        }
+            
+    }
 
     private static OS141 instance;
 
-    static void instance(String[] argv) {
+    static OS141 instance(String[] argv) {
         if(instance == null) instance = new OS141(argv);
         return instance;
     }
