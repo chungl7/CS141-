@@ -250,7 +250,7 @@ class PrintJobThread extends Thread {
 }
 
 public class OS141 {
-    int NUM_USERS = 4, NUM_DISKS = 2, NUM_PRINTERS = 3;
+    int NUM_USERS = 1, NUM_DISKS = 1, NUM_PRINTERS = 1;
     String userFileNames[];
     UserThread users[];
     Disk disks[];
