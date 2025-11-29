@@ -144,6 +144,8 @@ class UserThread extends Thread {
     static PrinterManager printerManager;
     static DirectoryManager directoryManager;
 
+    private ArrayList<PrintJobThread> printJobs = new ArrayList<>();
+
     UserThread(String fileName) {
         this.fileName = fileName;
     }
@@ -151,6 +153,13 @@ class UserThread extends Thread {
     public void run()
     {
         processUserCommands(fileName);
+        for (PrintJobThread job: printJobs) {
+            try {
+                job.join();
+            } catch (InterruptedException e){
+                
+            }
+        }
     }
 
     private void processUserCommands(String fileName) {
