@@ -1,6 +1,76 @@
 import java.io.*;
 import java.util.*;
 
+public class MainClass 
+{
+    public static int NUM_USERS = 1;
+    public static int NUM_DISKS = 1;
+    public static int NUM_PRINTERS = 1;
+
+    public static UserThread[] users;
+    public static Disk[] disks;
+    public static Printer[] printers;
+    public static DiskManager diskManager;
+    public static PrinterManager printerManager;
+    public static DirectoryManager directoryManager;
+
+    public static void main(String[] args)
+    {
+        if (args.length == 3)
+        {
+            try 
+            {
+                NUM_USERS = Integer.parseInt(args[0].replace("-", ""));
+                NUM_DISKS = Integer.parseInt(args[1].replace("-", ""));
+                NUM_PRINTERS = Integer.parseInt(args[2].replace("-", ""));
+            } catch (NumberFormatException e) 
+            {
+                System.out.println("Invalid arguments. Using defaults: 1 User, 1 Disk, 1 Printer");
+            }
+        }
+
+        directoryManager = new DirectoryManager(); 
+        
+        disks = new Disk[NUM_DISKS];
+        for (int i = 0; i < NUM_DISKS; i++)
+        {
+            disks[i] = new Disk();
+        }
+
+        printers = new Printer[NUM_PRINTERS];
+        for (int i = 0; i < NUM_PRINTERS; i++)
+        {
+            printers[i] = new Printer(i);
+        }
+
+        diskManager = new DiskManager(NUM_DISKS);
+        printerManager = new PrinterManager(NUM_PRINTERS);
+
+        users = new UserThread[NUM_USERS];
+        for (int i = 0; i < NUM_USERS; i++)
+        {
+            users[i] = new UserThread(i);
+        }
+
+        for (int i = 0; i < NUM_USERS; i++)
+        {
+            users[i].start();
+        }
+
+        for (int i = 0; i < NUM_USERS; i++)
+        {
+            try 
+            {
+                users[i].join();
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Simulation Complete.");
+    }
+}
+
 class Disk {
     static final int NUM_SECTORS = 2048;
     static final int DISK_DELAY = 80;
@@ -33,9 +103,7 @@ class Disk {
         data.setLength(0);
         data.append(sectors[sector]);
     }
-
 }
-
 
 class Printer {
     static final int PRINT_DELAY = 275;
@@ -50,6 +118,7 @@ class Printer {
             throw new RuntimeException(e);
         }
     }
+
     void print(StringBuffer data)
     {
         try {
@@ -73,12 +142,12 @@ class DirectoryManager {
     private Hashtable<String, FileInfo> T = 
         new Hashtable<String, FileInfo>();
 
-    void enter(StringBuffer fileName, FileInfo file) {
-        T.put(fileName.toString(),file);
+    void enter(String fileName, FileInfo file) {
+        T.put(fileName, file);
     }
 
-    FileInfo lookup(StringBuffer filename) {
-        return T.get(filename.toString());
+    FileInfo lookup(String fileName) {
+        return T.get(fileName);
     }
 }
 
@@ -93,17 +162,18 @@ class ResourceManager {
     synchronized int request() {
         while(true){
             for(int i = 0; i < isFree.length; ++i)
-                    if(isFree[i]) {
-                        isFree[i] = false;
-                        return i;
-                    }
-                try {
-                    this.wait();
-                } catch (InterruptedException e){
-
+                if(isFree[i]) {
+                    isFree[i] = false;
+                    return i;
                 }
+            try {
+                this.wait();
+            } catch (InterruptedException e){
+
+            }
         }
     }
+
     synchronized void release(int index) {
         isFree[index] = true;
         this.notify();
@@ -113,10 +183,10 @@ class ResourceManager {
 class DiskManager extends ResourceManager {
     private int[] freeSector;
 
-    DiskManager(Disk[] disk) {
-        super(disk.length);
-        freeSector = new int[disk.length];
-        for (int i = 0; i < disk.length; i++) {
+    DiskManager(int numDisks) {
+        super(numDisks);
+        freeSector = new int[numDisks];
+        for (int i = 0; i < numDisks; i++) {
             freeSector[i] = 0;
         }
     }
@@ -129,47 +199,41 @@ class DiskManager extends ResourceManager {
 }
 
 class PrinterManager extends ResourceManager {
-    PrinterManager(Printer[] printers) {
-        super(printers.length);
+    PrinterManager(int numberOfPrinters) {
+        super(numberOfPrinters);
     }
 }
 
 class UserThread extends Thread {
+    int userId;
     String fileName;
-    String line;
-
-    static Disk[] disks;
-    static Printer[] printers;
-    static DiskManager diskManager;
-    static PrinterManager printerManager;
-    static DirectoryManager directoryManager;
 
     private ArrayList<PrintJobThread> printJobs = new ArrayList<>();
 
-    UserThread(String fileName) {
-        this.fileName = fileName;
+    UserThread(int userId) {
+        this.userId = userId;
+        this.fileName = "USER" + userId;
     }
 
     public void run()
     {
-        processUserCommands(fileName);
+        processUserCommands();
         for (PrintJobThread job: printJobs) {
             try {
                 job.join();
             } catch (InterruptedException e){
-                
             }
         }
     }
 
-    private void processUserCommands(String fileName) {
+    private void processUserCommands() {
         try (BufferedReader buffer = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = buffer.readLine()) != null) {
                 if(line.startsWith(".save")) {
                     String[] parts = line.split("\\s+");
                     if (parts.length < 2) continue;
-                    StringBuffer name = new StringBuffer(parts[1]);
+                    String fname = parts[1];
 
                     ArrayList<StringBuffer> data = new ArrayList<>();
                     while ((line = buffer.readLine()) != null && !line.equals(".end")) {
@@ -182,14 +246,14 @@ class UserThread extends Thread {
                         empty.diskNumber = 0;
                         empty.startingSector = 0;
                         empty.fileLength = 0;
-                        directoryManager.enter(name, empty);
+                        MainClass.directoryManager.enter(fname, empty);
                         continue;
                     }
 
-                    int diskNum = diskManager.request();
+                    int diskNum = MainClass.diskManager.request();
                     try {
-                        int start = diskManager.allocateSectors(diskNum, fileLength);
-                        Disk d = disks[diskNum];
+                        int start = MainClass.diskManager.allocateSectors(diskNum, fileLength);
+                        Disk d = MainClass.disks[diskNum];
 
                         for(int i = 0; i < fileLength; i++) {
                             d.write(start + i, data.get(i));
@@ -199,18 +263,18 @@ class UserThread extends Thread {
                         info.diskNumber = diskNum;
                         info.startingSector = start;
                         info.fileLength = fileLength;
-                        directoryManager.enter(name, info);
+                        MainClass.directoryManager.enter(fname, info);
 
                     } finally {
-                        diskManager.release(diskNum);
+                        MainClass.diskManager.release(diskNum);
                     }
                 }
                 else if(line.startsWith(".print")) {
                     String[] part = line.split("\\s+");
                     if (part.length < 2) continue;
 
-                    StringBuffer name = new StringBuffer(part[1]);
-                    FileInfo info = directoryManager.lookup(name);
+                    String fname = part[1];
+                    FileInfo info = MainClass.directoryManager.lookup(fname);
                     if (info != null) {
                         PrintJobThread job = new PrintJobThread(info);
                         printJobs.add(job);
@@ -219,10 +283,8 @@ class UserThread extends Thread {
                 }
             }
         } catch (IOException e) {
-
         }
     }
-
 }
 
 class PrintJobThread extends Thread {
@@ -233,10 +295,10 @@ class PrintJobThread extends Thread {
     }
 
     public void run() {
-        int printerIndex = UserThread.printerManager.request();
+        int printerIndex = MainClass.printerManager.request();
         try {
-            Printer print = UserThread.printers[printerIndex];
-            Disk dis =UserThread.disks[info.diskNumber];
+            Printer print = MainClass.printers[printerIndex];
+            Disk dis = MainClass.disks[info.diskNumber];
 
             StringBuffer buffer = new StringBuffer();
             for(int i = 0; i < info.fileLength; i++){
@@ -244,97 +306,7 @@ class PrintJobThread extends Thread {
                 print.print(buffer);
             }
         } finally {
-            UserThread.printerManager.release(printerIndex);
+            MainClass.printerManager.release(printerIndex);
         }
-    }
-}
-
-public class OS141 {
-    int NUM_USERS = 1, NUM_DISKS = 1, NUM_PRINTERS = 1;
-    String userFileNames[];
-    UserThread users[];
-    Disk disks[];
-    Printer printers[];
-    DiskManager diskManager;
-    PrinterManager printerManager;
-    DirectoryManager directoryManager;
-
-
-    void configure(String argv[]) {
-        if (argv != null && argv.length >= 3) {
-            NUM_USERS = passArg(argv[0], NUM_USERS);
-            NUM_DISKS = passArg(argv[1], NUM_DISKS);
-            NUM_PRINTERS = passArg(argv[2], NUM_PRINTERS);
-        }
-        userFileNames = new String[NUM_USERS];
-        for (int i = 0; i < NUM_USERS; i++) {
-            userFileNames[i] = "USER" + i;
-        }
-
-    }
-
-    private int passArg(String str, int defaultVal) {
-        if (str == null || str.length() == 0) return defaultVal;
-        if (str.charAt(0) == '-') str = str.substring(1);
-        try {
-            return Integer.parseInt(str);
-        } catch (NumberFormatException e)
-        {
-            return defaultVal;
-        }
-    }
-
-    OS141(String [] argv) {
-        configure(argv);
-
-        disks = new Disk[NUM_DISKS];
-        for (int i = 0; i < NUM_DISKS; ++i)
-            disks[i] = new Disk();
-
-        printers = new Printer[NUM_PRINTERS];
-        for (int i = 0; i < NUM_PRINTERS; ++i)
-            printers[i] = new Printer(i);
-
-        directoryManager = new DirectoryManager();
-        diskManager = new DiskManager(disks);
-        printerManager = new PrinterManager(printers);
-
-        UserThread.disks = disks;
-        UserThread.printers = printers;
-        UserThread.diskManager = diskManager;
-        UserThread.printerManager = printerManager;
-        UserThread.directoryManager = directoryManager;
-        
-        users = new UserThread[NUM_USERS];
-        for(int i = 0; i < NUM_USERS; i++) {
-            users[i] = new UserThread(userFileNames[i]); 
-        }
-    }
-
-    void startUserThreads()
-    {for (int i=0; i < NUM_USERS; i++) users[i].start();}
-
-    void joinUserThreads() {
-        for(int i=0; i < NUM_USERS; i++) {
-            try {
-                users[i].join();
-            } catch (InterruptedException e) {
-
-            }
-        }
-            
-    }
-
-    private static OS141 instance;
-
-    static OS141 instance(String[] argv) {
-        return new OS141(argv);
-    }
-
-    public static void main(String[] args)
-    {
-        OS141 os = new OS141(args);
-        os.startUserThreads();
-        os.joinUserThreads();
     }
 }
