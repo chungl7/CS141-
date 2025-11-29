@@ -213,6 +213,7 @@ class UserThread extends Thread {
                     FileInfo info = directoryManager.lookup(name);
                     if (info != null) {
                         PrintJobThread job = new PrintJobThread(info);
+                        printJobs.add(job);
                         job.start();
                     }
                 }
@@ -327,13 +328,12 @@ public class OS141 {
     private static OS141 instance;
 
     static OS141 instance(String[] argv) {
-        if(instance == null) instance = new OS141(argv);
-        return instance;
+        return new OS141(argv);
     }
 
     public static void main(String[] args)
     {
-        OS141 os = instance(args);
+        OS141 os = new OS141(args);
         os.startUserThreads();
         os.joinUserThreads();
     }
