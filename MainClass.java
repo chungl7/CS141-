@@ -42,7 +42,6 @@ public class MainClass
 
             } catch (Exception e) {
                 System.err.println("Invalid arguments");
-                e.printStackTrace();
                 NUM_USERS = 1;
                 NUM_DISKS = 1;
                 NUM_PRINTERS = 1;
