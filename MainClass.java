@@ -16,16 +16,37 @@ public class MainClass
 
     public static void main(String[] args)
     {
-        if (args.length == 3)
-        {
-            try 
-            {
-                NUM_USERS = Integer.parseInt(args[0].replace("-", ""));
-                NUM_DISKS = Integer.parseInt(args[1].replace("-", ""));
-                NUM_PRINTERS = Integer.parseInt(args[2].replace("-", ""));
-            } catch (NumberFormatException e) 
-            {
-                System.out.println("Invalid arguments. Using defaults: 1 User, 1 Disk, 1 Printer");
+        String[] userFiles;
+
+        if (args.length < 3) {
+            NUM_USERS = 1;
+            NUM_DISKS = 1;
+            NUM_PRINTERS = 1;
+            userFiles = new String[] { "USER0" };
+        } else {
+            int index = 0;
+            try {
+                NUM_USERS = Integer.parseInt(args[index++].replace("-", ""));
+                userFiles = new String[NUM_USERS];
+                if (args.length >= 2 + NUM_USERS) {
+                    for (int i = 0; i < NUM_USERS; i++) {
+                        userFiles[i] = args[index++];
+                    }
+                } else {
+                    for (int i = 0; i < NUM_USERS; i++) {
+                        userFiles[i] = "USER" + i;
+                    }
+                }
+                NUM_DISKS = Integer.parseInt(args[index++].replace("-", ""));
+                NUM_PRINTERS = Integer.parseInt(args[index++].replace("-", ""));
+
+            } catch (Exception e) {
+                System.err.println("Invalid arguments");
+                e.printStackTrace();
+                NUM_USERS = 1;
+                NUM_DISKS = 1;
+                NUM_PRINTERS = 1;
+                userFiles = new String[] { "USER0" };
             }
         }
 
@@ -64,7 +85,7 @@ public class MainClass
                 users[i].join();
             } catch (InterruptedException e)
             {
-                e.printStackTrace();
+                
             }
         }
         System.out.println("Simulation Complete.");
